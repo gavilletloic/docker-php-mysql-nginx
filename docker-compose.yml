@@ -1,0 +1,43 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+version: "3.1"
+services:
+
+  memcached:
+    image: memcached:alpine
+    container_name: memcahced-memcached
+
+  mysql:
+    image: mysql:5.6
+    container_name: prestashop-docker-mysql
+    working_dir: /application
+    volumes:
+      - .:/application
+    environment:
+      - MYSQL_ROOT_PASSWORD=changeMe
+      - MYSQL_DATABASE=laravel
+      - MYSQL_USER=loic
+      - MYSQL_PASSWORD=changeMe
+    ports:
+      - "3306:3306"
+
+  webserver:
+    image: nginx:alpine
+    container_name: prestashop-docker-webserver
+    working_dir: /application
+    volumes:
+      - .:/application
+      - ./phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+      - "9000:9000"
+
+  php-fpm:
+    build: phpdocker/php-fpm
+    container_name: prestashop-docker-php-fpm
+    working_dir: /application
+    volumes:
+      - .:/application
+      - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php5/fpm/conf.d/99-overrides.ini
+
